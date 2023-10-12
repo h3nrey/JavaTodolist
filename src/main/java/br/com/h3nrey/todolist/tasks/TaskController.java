@@ -2,10 +2,12 @@ package br.com.h3nrey.todolist.tasks;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +26,7 @@ public class TaskController {
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
         // Setting user id
         var userId = request.getAttribute("userId");
-        taskModel.setId((UUID) userId);
+        taskModel.setUserId((UUID) userId);
 
         // Validate start date
         var curDate = LocalDateTime.now();
@@ -43,7 +45,17 @@ public class TaskController {
                     .body("A data de inicio precisa ser depois da data de término");
         }
 
+        System.out.println("task created with this user id: " + taskModel.getUserId());
         var task = this.taskRepository.save(taskModel);
         return ResponseEntity.status(HttpStatus.OK).body(task);
+    }
+
+    @GetMapping("/")
+    public List<TaskModel> List(HttpServletRequest request) {
+        var userId = request.getAttribute("userId");
+
+        System.out.println("user id: " + userId);
+        var tasks = this.taskRepository.findByUserId((UUID) userId);
+        return tasks;
     }
 }

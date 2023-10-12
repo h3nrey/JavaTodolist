@@ -28,7 +28,7 @@ public class FilterTaskAuth extends OncePerRequestFilter {
             throws ServletException, IOException {
         var servletPath = request.getServletPath();
 
-        Set<String> protectedRoutes = Set.of("/tasks/create");
+        Set<String> protectedRoutes = Set.of("/tasks/create", "/tasks/");
 
         if (protectedRoutes.contains(servletPath) == false) {
             filterChain.doFilter(request, response);
