@@ -2,6 +2,7 @@ package br.com.h3nrey.todolist.filter;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,15 @@ public class FilterTaskAuth extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        var servletPath = request.getServletPath();
+
+        Set<String> protectedRoutes = Set.of("/tasks/create");
+
+        if (protectedRoutes.contains(servletPath) == false) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Get auth info
         var auth = request.getHeader("Authorization");
         var authEncoded = auth.substring("Basic".length()).trim();
@@ -32,9 +42,6 @@ public class FilterTaskAuth extends OncePerRequestFilter {
         String[] credentials = new String(auth64).split(":");
         String username = credentials[0];
         String password = credentials[1];
-
-        System.out.println("username: " + username);
-        System.out.println("password: " + password);
 
         // Validate username
         var user = this.userRepository.findByUsername(username);
@@ -53,6 +60,7 @@ public class FilterTaskAuth extends OncePerRequestFilter {
         }
 
         // Next
+        request.setAttribute("userId", user.getId());
         filterChain.doFilter(request, response);
     }
 
