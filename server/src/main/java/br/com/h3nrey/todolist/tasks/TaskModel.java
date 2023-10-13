@@ -31,4 +31,11 @@ public class TaskModel {
 
     private UUID userId;
 
+    public void setTitle(String title) throws Exception {
+        if (title.length() > 50) {
+            throw new Exception("título precisa ter no máximo 50 caracteres");
+        }
+
+        this.title = title;
+    }
 }
